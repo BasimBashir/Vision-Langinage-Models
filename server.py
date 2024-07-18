@@ -46,6 +46,18 @@ def upload():
         # Release GPU memory
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+    elif selected_model == 'MiniCPM_llama3_vision_2_5':
+        from MiniCPM_Llama3_Vision import scrape_Image
+        response = scrape_Image(image, query)
+        # Release GPU memory
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    elif selected_model == 'CogVLM':
+        from CogVLM import scrape_Image_cogvlm
+        response = scrape_Image_cogvlm(image, query)
+        # Release GPU memory
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
     else:
         response = "Invalid model selected"
     

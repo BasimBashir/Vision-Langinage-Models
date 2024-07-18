@@ -26,7 +26,17 @@ RUN python3 -m pip install --user --upgrade pip
 
 RUN pip3 install torch torchvision torchaudio
 
-RUN pip install -U ninja transformers accelerate flask flask_cors Pillow peft sentencepiece timm packaging einops
+RUN pip3 install -U xformers --index-url https://download.pytorch.org/whl/cu121
+
+RUN pip install -U ninja bitsandbytes transformers accelerate flask flask_cors Pillow peft sentencepiece timm packaging einops
+
+RUN git clone https://github.com/NVIDIA/apex
+
+RUN cd apex
+
+RUN pip install -v --disable-pip-version-check --no-cache-dir --no-build-isolation --config-settings "--build-option=--cpp_ext" --config-settings "--build-option=--cuda_ext" ./
+
+RUN cd ..
 
 RUN ldconfig -v
 

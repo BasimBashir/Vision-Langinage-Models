@@ -8,35 +8,38 @@ model_id = "llama3_vision" #"qresearch/llama-3-vision-alpha-hf"
 
 memory = []  # Initialize an empty list to store the memory
 
+@torch.inference_mode()
 def inference(image, question):
     # image = Image.open(image_path)
 
-    # -----Set CUDA
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    with torch.no_grad():
+        # -----Set CUDA
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True, torch_dtype=torch.float16)
-    tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
+        model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True, torch_dtype=torch.float16)
+        tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
 
-    model.to(device)
-    model.eval()
-    
-    # # Prepare the context based on the last 5 questions and answers
-    # context = ""
-    # for entry in memory[-5:]:
-    #     context += f"Question: {entry['question']}\nAnswer: {entry['answer']}\n\n"
-    
-    # # Add the current question to the context
-    # context += f"Question: {question}"
-    
-    # Generate the answer using the context
-    answer = tokenizer.decode(model.answer_question(image, question, tokenizer), skip_special_tokens=True)
-    
-    # Store the question and answer in memory
-    # memory.append({"question": question, "answer": answer})
+        model.to(device)
+        model.eval()
+        
+        # # Prepare the context based on the last 5 questions and answers
+        # context = ""
+        # for entry in memory[-5:]:
+        #     context += f"Question: {entry['question']}\nAnswer: {entry['answer']}\n\n"
+        
+        # # Add the current question to the context
+        # context += f"Question: {question}"
+        
+        # Generate the answer using the context
+        answer = tokenizer.decode(model.answer_question(image, question, tokenizer), skip_special_tokens=True)
+        
+        # Store the question and answer in memory
+        # memory.append({"question": question, "answer": answer})
 
     # Release GPU memory
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
+    del model
+    del tokenizer
+    torch.cuda.empty_cache()
     
     return answer
 
